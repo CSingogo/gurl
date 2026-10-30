@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gurl: a curl-inspired HTTP client in Go</title>
+  <meta name="description" content="gurl is a curl-inspired HTTP and WebSocket client written in Go. Same flags as curl, friendlier output in a terminal.">
+  <link rel="canonical" href="https://gurl.somosingogo.dev/">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>g<span>url</span></h1>
+  <p class="lead">A curl-inspired HTTP client written in Go. It speaks curl's flags, so muscle memory works, and it shows you nicer output when you are looking at a terminal.</p>
+
+  <h2>Install</h2>
+  <pre><code class="prompt">curl -fsSL https://gurl.somosingogo.dev/install.sh | sh</code></pre>
+  <p class="note">Linux and macOS. The script downloads the right binary from GitHub Releases and checks its sha256. Set <code>GURL_VERSION</code> to pin a release, <code>GURL_INSTALL_DIR</code> to choose where it goes.</p>
+  <pre><code class="prompt">go install github.com/CSingogo/gurl/cmd/gurl@latest</code></pre>
+  <p class="note">Windows: download the .zip from <a href="https://github.com/CSingogo/gurl/releases">GitHub Releases</a>. Homebrew, apt and Arch packages are on the way.</p>
+
+  <h2>Try it</h2>
+  <p>This server runs gurl's test endpoints. Point gurl at it:</p>
+<pre><code class="prompt">gurl gurl.somosingogo.dev/get</code>
+<code class="prompt">gurl -sSL -o /dev/null -w '%{http_code} %{url_effective}\n' gurl.somosingogo.dev/redirect/3</code>
+<code class="prompt">gurl --json '{"name":"gurl"}' gurl.somosingogo.dev/post</code>
+<code class="prompt">gurl -i gurl.somosingogo.dev/status/418</code></pre>
+  <p class="note">When output goes to a terminal, gurl colors headers and indents JSON. Piped, written with <code>-o</code>, or with <code>NO_COLOR</code> or <code>--raw</code> set, the body is exactly what curl would print.</p>
+
+  <h2>Test endpoints</h2>
+  <table>
+    <tr><td><a href="/get">/get</a></td><td>Echoes the request: query, headers, caller address. <code>/post</code>, <code>/put</code>, <code>/patch</code>, <code>/delete</code> and <code>/anything</code> do the same and also parse form, multipart and JSON bodies.</td></tr>
+    <tr><td><a href="/headers">/headers</a></td><td>Just the request headers.</td></tr>
+    <tr><td><a href="/ip">/ip</a></td><td>Your IP address.</td></tr>
+    <tr><td><a href="/user-agent">/user-agent</a></td><td>Your User-Agent.</td></tr>
+    <tr><td><a href="/status/418">/status/{code}</a></td><td>Replies with that status code (100 to 599).</td></tr>
+    <tr><td><a href="/delay/2">/delay/{n}</a></td><td>Waits n seconds (0 to 10), then answers like <code>/get</code>.</td></tr>
+    <tr><td><a href="/bytes/64?seed=1">/bytes/{n}</a></td><td>n random bytes, up to 1 MB. Add <code>?seed=N</code> to make them repeatable.</td></tr>
+    <tr><td><a href="/redirect/3">/redirect/{n}</a></td><td>Redirects n times (1 to 20), ending at <code>/get</code>.</td></tr>
+    <tr><td><a href="/basic-auth/user/pass">/basic-auth/{user}/{pass}</a></td><td>401 unless you send those credentials with <code>-u</code>.</td></tr>
+    <tr><td><a href="/json">/json</a></td><td>A small JSON document.</td></tr>
+    <tr><td><a href="/gzip">/gzip</a></td><td>A gzip-compressed JSON reply.</td></tr>
+  </table>
+  <p class="note">Fair use: requests are rate limited per IP, bodies are capped at 1 MB.</p>
+
+  <h2>Options</h2>
+  <pre>{{.Help}}</pre>
+
+  <footer>
+    gurl {{.Version}} · MIT licensed · <a href="https://github.com/CSingogo/gurl">source on GitHub</a> · built by <a href="https://somosingogo.dev">somosingogo</a>
+  </footer>
+</body>
+</html>
