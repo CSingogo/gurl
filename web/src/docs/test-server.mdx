@@ -21,7 +21,7 @@ This domain runs a small echo server, written in Go too, so you can try gurl wit
 | `/gzip` | A gzip-compressed response |
 
 ```sh
-gurl -L gurl.somosingogo.dev/redirect/3
-gurl -m 2 gurl.somosingogo.dev/delay/5    # times out, exit code 28
-gurl -f gurl.somosingogo.dev/status/404   # exit code 22
+gurl -L https://gurl.somosingogo.dev/redirect/3
+gurl -m 2 https://gurl.somosingogo.dev/delay/5    # times out, exit code 28
+gurl -f https://gurl.somosingogo.dev/status/404   # exit code 22
 ```

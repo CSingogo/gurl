@@ -27,26 +27,26 @@ Other ways are on the [install page](/docs/install). Pick your system in the top
 ## Your first request
 
 ```sh
-gurl gurl.somosingogo.dev/get
+gurl https://gurl.somosingogo.dev/get
 ```
 
-A bare host gets `http://` added, like curl. In a terminal the JSON is indented and coloured. Pipe it and you get the exact bytes:
+A bare host gets `http://` added, like curl. This site redirects `http` to `https`, so the examples spell out `https://`; add `-L` if you leave it off. In a terminal the JSON is indented and coloured. Pipe it and you get the exact bytes:
 
 ```sh
-gurl gurl.somosingogo.dev/get | jq .headers
+gurl https://gurl.somosingogo.dev/get | jq .headers
 ```
 
 ## Send data
 
 ```sh
 # JSON, with the right Content-Type and Accept headers set for you
-gurl --json '{"name":"gopher"}' gurl.somosingogo.dev/post
+gurl --json '{"name":"gopher"}' https://gurl.somosingogo.dev/post
 
 # Form data, read from a file
-gurl -d @form.txt gurl.somosingogo.dev/post
+gurl -d @form.txt https://gurl.somosingogo.dev/post
 
 # Basic auth, then check the status code in a script
-gurl -s -o /dev/null -w '%{http_code}\n' -u user:pass gurl.somosingogo.dev/basic-auth/user/pass
+gurl -s -o /dev/null -w '%{http_code}\n' -u user:pass https://gurl.somosingogo.dev/basic-auth/user/pass
 ```
 
 ## Exit codes

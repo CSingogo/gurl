@@ -5,7 +5,7 @@ const items = [
   {
     id: "get",
     label: "GET /get",
-    cmd: "gurl gurl.somosingogo.dev/get",
+    cmd: "gurl https://gurl.somosingogo.dev/get",
     status: "200",
     time: "38 ms",
     size: "312 B",
@@ -22,7 +22,7 @@ const items = [
   {
     id: "post",
     label: "POST /post",
-    cmd: `gurl --json '{"name":"gopher"}' gurl.somosingogo.dev/post`,
+    cmd: `gurl --json '{"name":"gopher"}' https://gurl.somosingogo.dev/post`,
     status: "200",
     time: "41 ms",
     size: "398 B",
@@ -38,7 +38,7 @@ const items = [
   {
     id: "teapot",
     label: "GET /status/418",
-    cmd: "gurl -i gurl.somosingogo.dev/status/418",
+    cmd: "gurl -i https://gurl.somosingogo.dev/status/418",
     status: "418",
     time: "29 ms",
     size: "62 B",
@@ -48,7 +48,7 @@ const items = [
   {
     id: "redirect",
     label: "GET /redirect/3",
-    cmd: "gurl -L -w '%{num_redirects} redirects' gurl.somosingogo.dev/redirect/3",
+    cmd: "gurl -L -w '%{num_redirects} redirects' https://gurl.somosingogo.dev/redirect/3",
     status: "200",
     time: "112 ms",
     size: "301 B",
