@@ -81,6 +81,7 @@ const (
 	ExitCouldntConnect      = 7
 	ExitHTTPError           = 22 // -f with a 4xx/5xx response
 	ExitWriteError          = 23
+	ExitReadError           = 26
 	ExitTimeout             = 28
 	ExitTooManyRedirects    = 47
 	ExitSSL                 = 60
