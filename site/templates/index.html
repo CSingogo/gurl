@@ -21,10 +21,7 @@
 
   <h2>Try it</h2>
   <p>This server runs gurl's test endpoints. Point gurl at it:</p>
-<pre><code class="prompt">gurl gurl.somosingogo.dev/get</code>
-<code class="prompt">gurl -sSL -o /dev/null -w '%{http_code} %{url_effective}\n' gurl.somosingogo.dev/redirect/3</code>
-<code class="prompt">gurl --json '{"name":"gurl"}' gurl.somosingogo.dev/post</code>
-<code class="prompt">gurl -i gurl.somosingogo.dev/status/418</code></pre>
+<pre><code class="prompt">gurl gurl.somosingogo.dev/get</code><code class="prompt">gurl -sSL -o /dev/null -w '%{http_code} %{url_effective}\n' gurl.somosingogo.dev/redirect/3</code><code class="prompt">gurl --json '{"name":"gurl"}' gurl.somosingogo.dev/post</code><code class="prompt">gurl -i gurl.somosingogo.dev/status/418</code></pre>
   <p class="note">When output goes to a terminal, gurl colors headers and indents JSON. Piped, written with <code>-o</code>, or with <code>NO_COLOR</code> or <code>--raw</code> set, the body is exactly what curl would print.</p>
 
   <h2>Test endpoints</h2>
