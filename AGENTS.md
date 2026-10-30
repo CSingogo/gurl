@@ -7,12 +7,19 @@ The owner is learning Go and Linux by reading this code. Keep commits small (one
 ## Commands
 
 - `go test ./...`: all tests (CI also runs `go vet` and `-race`)
-- `go run ./cmd/gurl <args>`: run the CLI
+- `go run ./cmd/gurl <args>`: run the CLI (`go build -o bin/gurl ./cmd/gurl` for a binary)
 - `go run ./cmd/gurl-server`: serve the site and endpoints on 127.0.0.1:8088
+
+## Layout
+
+- `internal/cli`: flag parser and URL normalization (pure, no I/O)
+- `internal/request`: Options to `*http.Request`, client policy (redirects, timeouts, TLS), error to exit-code mapping
+- `internal/output`: headers, pretty JSON, `-w` expansion
+- `internal/app`: ties them together; `cmd/gurl` is a thin `main`
 
 ## Rules
 
 - Standard library only, unless PLAN.md says otherwise. WebSocket is hand-written (RFC 6455).
-- Flags keep curl's names and meaning. Raw output (piped, `-o`, `NO_COLOR`, `--raw`) must match curl byte for byte; pretty output is only for a TTY.
+- Flags keep curl's names and meaning. Raw output (piped, `-o`, `NO_COLOR`, `--raw`) must match curl byte for byte for bodies; pretty output is only for a TTY. Response headers are the exception: `net/http` keeps them in a map, so the server's order and original casing are lost and gurl prints them sorted.
 - Exit codes follow curl (`man curl`, EXIT CODES).
 - Table-driven tests for parsers and codecs.
