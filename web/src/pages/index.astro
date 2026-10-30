@@ -2,6 +2,7 @@
 import Base from "@/layouts/Base.astro";
 import InstallTerminal from "@/components/InstallTerminal.astro";
 import WindowDemo from "@/components/WindowDemo.astro";
+import PlatformStrip from "@/components/PlatformStrip.astro";
 import FadeContent from "@/components/react-bits/FadeContent.tsx";
 import { site } from "@/lib/site";
 
@@ -71,6 +72,12 @@ const features = [
         <InstallTerminal />
       </div>
     </FadeContent>
+  </section>
+
+  <section class="border-b border-line">
+    <div class="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+      <FadeContent client:load effect="mist" duration={1.8} ease="power2.out" stagger={0.1} threshold={0.1} data-fade-content><PlatformStrip /></FadeContent>
+    </div>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 py-20 sm:px-6">

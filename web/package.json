@@ -24,6 +24,7 @@
     "@astrojs/check": "^0.9.12",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "simple-icons": "^16.36.0",
     "typescript": "^5"
   }
 }

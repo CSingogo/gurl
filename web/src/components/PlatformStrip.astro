@@ -1,0 +1,37 @@
+---
+import { siApple, siUbuntu, siArchlinux, siLinux } from "simple-icons";
+
+// Clicking a platform picks it everywhere: it feeds the same [data-os-tab] handler
+// as the install terminal tabs, so the terminal above switches to that system.
+const platforms = [
+  { id: "macos", label: "macOS", paths: [siApple.path] },
+  { id: "ubuntu", label: "Ubuntu / Debian", paths: [siUbuntu.path] },
+  { id: "arch", label: "Arch Linux", paths: [siArchlinux.path] },
+  { id: "linux", label: "Other Linux", paths: [siLinux.path] },
+  // simple-icons has no Windows logo, so this is the four-pane mark drawn by hand.
+  { id: "windows", label: "Windows", paths: ["M0 3.45 9.8 2.1v9.45H0zM11 1.93 24 0v11.55H11zM0 12.45h9.8v9.45L0 20.55zM11 12.45h13V24l-13-1.8z"] },
+];
+---
+
+<div class="text-center">
+  <p class="text-lg text-fg">Runs on the systems you love<span class="cursor"></span></p>
+  <ul class="mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+    {
+      platforms.map((p) => (
+        <li>
+          <button
+            data-os-tab={p.id}
+            aria-label={p.label}
+            title={p.label}
+            class="group flex flex-col items-center gap-2 text-[#5c5c66] transition-colors hover:text-fg"
+          >
+            <svg viewBox="0 0 24 24" class="size-9 fill-current" aria-hidden="true">
+              {p.paths.map((d) => <path d={d} />)}
+            </svg>
+            <span class="text-xs opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{p.label}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+</div>
