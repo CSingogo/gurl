@@ -1,0 +1,50 @@
+# GoReleaser builds every platform, packages it and publishes a GitHub Release
+# when a tag like v0.1.0 is pushed. Docs: https://goreleaser.com
+version: 2
+project_name: gurl
+
+builds:
+  - id: gurl
+    main: ./cmd/gurl
+    binary: gurl
+    env:
+      - CGO_ENABLED=0 # pure Go: one static binary with no libc dependency
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X github.com/CSingogo/gurl/internal/request.Version={{.Version}}
+
+archives:
+  - id: gurl
+    # No version in the name on purpose: install.sh can then use GitHub's
+    # stable ".../releases/latest/download/<name>" URL without calling the API.
+    name_template: "gurl_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+nfpms:
+  - id: packages
+    package_name: gurl
+    file_name_template: "gurl_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://gurl.somosingogo.dev
+    maintainer: Chisomo Singogo <singogosingogo@gmail.com>
+    description: A curl-inspired HTTP and WebSocket client written in Go.
+    license: MIT
+    formats: [deb, rpm, apk]
+    bindir: /usr/bin
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  filters:
+    exclude:
+      - "^chore"
+      - "^style"

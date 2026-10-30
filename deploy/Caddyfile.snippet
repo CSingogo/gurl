@@ -1,0 +1,22 @@
+# Append to /etc/caddy/Caddyfile on the VPS (and to somo-dev/deploy/Caddyfile,
+# which is the source of truth for that file).
+#
+# Cloudflare's free certificate covers one subdomain level (*.somosingogo.dev),
+# which is why this is gurl.somosingogo.dev and not something.gurl.somosingogo.dev.
+
+gurl.somosingogo.dev {
+	encode zstd gzip
+
+	# Static apt repository (added once the signing key exists).
+	handle /apt/* {
+		root * /var/www/gurl
+		file_server
+	}
+
+	# Everything else is the Go server. Caddy forwards WebSocket upgrades
+	# automatically and adds X-Forwarded-For; Cloudflare's CF-Connecting-IP
+	# header passes through untouched.
+	handle {
+		reverse_proxy 127.0.0.1:8088
+	}
+}

@@ -1,0 +1,37 @@
+# /etc/systemd/system/gurl.service
+#
+# systemd starts gurl-server at boot, restarts it if it crashes, collects its
+# log output (journalctl -u gurl -f) and stops it with SIGTERM, which the server
+# handles by finishing in-flight requests first.
+[Unit]
+Description=gurl test server and docs site
+After=network.target
+
+[Service]
+User=gurl
+Group=gurl
+ExecStart=/opt/gurl/gurl-server
+Environment=GURL_ADDR=127.0.0.1:8088
+Restart=on-failure
+RestartSec=2
+
+# Sandboxing. The server only needs to read its own binary and talk TCP, so
+# everything else is taken away. `systemd-analyze security gurl` scores this.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

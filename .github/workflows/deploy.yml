@@ -1,0 +1,75 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false # let a running deploy finish rather than kill it halfway
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - run: go vet ./...
+      - run: go test -race ./...
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # for git describe
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      # A static linux/amd64 binary: the site files are embedded in it, so this
+      # one file is the whole deployment.
+      - name: Build
+        run: |
+          VERSION=$(git describe --tags --always --dirty)
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
+            -ldflags "-s -w -X main.version=$VERSION" \
+            -o gurl-server ./cmd/gurl-server
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # Upload next to the live binary, then rename: mv within one directory is
+      # atomic, so the service never sees a half-written file.
+      - name: Upload and restart
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          rsync -z --chmod=755 gurl-server "$SSH_USER@$SSH_HOST:/opt/gurl/gurl-server.new"
+          ssh "$SSH_USER@$SSH_HOST" 'mv /opt/gurl/gurl-server.new /opt/gurl/gurl-server && sudo systemctl restart gurl'
+
+      # Fail the workflow (and show up red on GitHub) if the new version is not serving.
+      - name: Health check
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if ssh "$SSH_USER@$SSH_HOST" 'curl -fsS http://127.0.0.1:8088/healthz'; then exit 0; fi
+            sleep 1
+          done
+          echo "gurl-server did not come up" >&2
+          ssh "$SSH_USER@$SSH_HOST" 'journalctl -u gurl -n 30 --no-pager' || true
+          exit 1
