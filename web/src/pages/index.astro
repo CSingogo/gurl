@@ -2,6 +2,7 @@
 import Base from "@/layouts/Base.astro";
 import InstallTerminal from "@/components/InstallTerminal.astro";
 import WindowDemo from "@/components/WindowDemo.astro";
+import FadeContent from "@/components/react-bits/FadeContent.tsx";
 import { site } from "@/lib/site";
 
 const features = [
@@ -41,7 +42,7 @@ const features = [
 
 <Base>
   <section class="hero-glow border-b border-line">
-    <div class="mx-auto flex max-w-5xl flex-col items-center px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24">
+    <FadeContent client:load effect="mist" duration={1.8} ease="power2.out" stagger={0.1} threshold={0.1} data-fade-content trigger="mount" className="mx-auto flex max-w-5xl flex-col items-center px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24">
       <a
         href={site.repo + "/releases"}
         class="mb-8 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3.5 py-1.5 text-sm text-muted transition-colors hover:text-fg"
@@ -69,14 +70,15 @@ const features = [
       <div class="mt-14 w-full">
         <InstallTerminal />
       </div>
-    </div>
+    </FadeContent>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-    <WindowDemo />
+    <FadeContent client:load effect="mist" duration={1.8} ease="power2.out" stagger={0.1} threshold={0.1} data-fade-content><WindowDemo /></FadeContent>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+    <FadeContent client:load effect="mist" duration={1.8} ease="power2.out" stagger={0.1} threshold={0.1} data-fade-content>
     <p class="text-xs uppercase tracking-[0.25em] text-muted">Why gurl<span class="text-brand">_</span></p>
     <h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
       Everything you reach for curl for, and a bit nicer to look at.
@@ -101,10 +103,11 @@ const features = [
         ))
       }
     </div>
+    </FadeContent>
   </section>
 
   <section class="border-t border-line">
-    <div class="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
+    <FadeContent client:load effect="mist" duration={1.8} ease="power2.out" stagger={0.1} threshold={0.1} data-fade-content className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
       <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
         Free and open source<span class="cursor"></span>
       </h2>
@@ -116,6 +119,6 @@ const features = [
         <a href={site.repo + "/issues"} class="rounded-xl border border-line bg-surface px-4 py-4 transition-colors hover:bg-surface-2">Report an issue</a>
         <a href={site.sponsor} class="rounded-xl border border-brand/40 bg-brand/10 px-4 py-4 text-brand transition-colors hover:bg-brand/20">♥ Become a sponsor</a>
       </div>
-    </div>
+    </FadeContent>
   </section>
 </Base>

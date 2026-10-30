@@ -34,3 +34,5 @@ Astro 7, static output, Tailwind v4, MDX docs, bun. Same repo, separate toolchai
 - Install commands for the home page terminal are in `components/InstallTerminal.astro`. Channels that don't exist yet are marked `soon`; remove the flag when the channel ships.
 - Hosting: CI rsyncs `web/dist/` to `/var/www/gurl/site/`. Caddy serves it and proxies only the Go server's paths (list in `deploy/Caddyfile.snippet`). When you add a route to `internal/server`, add it to that `@api` matcher, install it by hand on the VPS and copy it to `somo-dev/deploy/Caddyfile`.
 - The Go server's own `/` page (`site/` at the repo root) is no longer reachable through Caddy; it remains as a fallback for local runs.
+
+React is used only for islands in `web/` (`components/react-bits/FadeContent.tsx`, copied from React Bits, needs gsap). Wrap content in `<FadeContent client:load ... data-fade-content>`; the `noscript` rule in `layouts/Base.astro` keeps it visible without JavaScript.

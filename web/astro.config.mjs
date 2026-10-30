@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
 import mdx from "@astrojs/mdx";
+import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -9,7 +10,7 @@ export default defineConfig({
   site: "https://gurl.somosingogo.dev",
   output: "static",
   redirects: { "/docs": "/docs/getting-started" },
-  integrations: [mdx(), sitemap()],
+  integrations: [react(), mdx(), sitemap()],
   vite: { plugins: [tailwindcss()] },
   markdown: { shikiConfig: { theme: "github-dark-default" } },
   fonts: [
