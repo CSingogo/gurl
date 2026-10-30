@@ -1,5 +1,10 @@
 # Plan: gurl, a curl-inspired HTTP client in Go
 
+## Status (updated 2026-10-30)
+Done and tested locally: CLI parser, request engine, output formatting, `gurl-server` (site + endpoints), `install.sh`, GoReleaser config, CI/release/deploy workflows, systemd unit, Caddy block.
+Waiting on: GitHub repo + secrets, DNS record, VPS setup (see `deploy/SERVER-SETUP.md`), first `v0.1.0` tag.
+Deviations from the plan below: `install.sh` lives in `site/` (Go's `embed` cannot reach outside a package directory); the `--help` text is one constant in `internal/cli` shared by the CLI and the docs page.
+
 ## Context
 The user is learning Go and Linux and wants a real project to build and host on their VPS (`somo@31.97.114.157`, Ubuntu 24.04, Caddy, behind Cloudflare). gurl is a CLI that uses curl's flags (`gurl localhost:2015`, `gurl -sSL -H ... url`) with nicer output in a terminal. It has its own site and a test server on `gurl.somosingogo.dev`.
 
