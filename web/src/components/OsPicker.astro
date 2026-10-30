@@ -1,0 +1,13 @@
+---
+import { osList } from "@/lib/site";
+---
+
+<label class="flex items-center gap-2 text-sm text-muted">
+  <span class="sr-only sm:not-sr-only">System</span>
+  <select
+    data-os-picker
+    class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-fg outline-none focus:border-brand"
+  >
+    {osList.map((o) => <option value={o.id}>{o.label}</option>)}
+  </select>
+</label>

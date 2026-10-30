@@ -1,0 +1,100 @@
+---
+import { osList, site, type OsId } from "@/lib/site";
+
+// One entry per system. `soon` marks channels that are planned but not published yet,
+// so the page never promises a command that fails today.
+interface Line {
+  cmd: string;
+  note?: string;
+  soon?: boolean;
+}
+const commands: Record<OsId, Line[]> = {
+  macos: [
+    { cmd: `curl -fsSL ${site.installScript} | sh` },
+    { cmd: "brew install CSingogo/tap/gurl", note: "Homebrew", soon: true },
+    { cmd: site.goInstall, note: "needs Go" },
+  ],
+  ubuntu: [
+    { cmd: `curl -fsSL ${site.installScript} | sh` },
+    { cmd: "sudo apt install gurl", note: "signed apt repo", soon: true },
+    { cmd: site.goInstall, note: "needs Go" },
+  ],
+  arch: [
+    { cmd: `curl -fsSL ${site.installScript} | sh` },
+    { cmd: "yay -S gurl-bin", note: "AUR", soon: true },
+    { cmd: site.goInstall, note: "needs Go" },
+  ],
+  linux: [
+    { cmd: `curl -fsSL ${site.installScript} | sh` },
+    { cmd: site.goInstall, note: "needs Go" },
+  ],
+  windows: [
+    { cmd: site.goInstall, note: "needs Go" },
+    { cmd: `# or download gurl_windows_amd64.zip from\n# ${site.releases}`, note: "" },
+  ],
+};
+---
+
+<div class="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-line bg-surface text-left shadow-2xl shadow-black/40">
+  <div class="flex items-center gap-3 border-b border-line px-4 py-3">
+    <div class="flex gap-1.5" aria-hidden="true">
+      <span class="size-3 rounded-full bg-[#ff5f57]"></span>
+      <span class="size-3 rounded-full bg-[#febc2e]"></span>
+      <span class="size-3 rounded-full bg-[#28c840]"></span>
+    </div>
+    <div role="tablist" aria-label="Operating system" class="ml-2 flex flex-1 gap-1 overflow-x-auto text-sm">
+      {
+        osList.map((o) => (
+          <button
+            role="tab"
+            data-os-tab={o.id}
+            aria-selected="false"
+            class="whitespace-nowrap rounded-md px-2.5 py-1 text-muted transition-colors hover:text-fg aria-selected:bg-surface-2 aria-selected:text-fg"
+          >
+            {o.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+  <div class="px-5 py-5 font-mono text-[13px] leading-7 sm:text-sm">
+    {
+      osList.map((o) => (
+        <div data-os-only={o.id} hidden={o.id !== "macos"} class="space-y-3">
+          {commands[o.id].map((l) => (
+            <div class="group flex items-start gap-3">
+              <span class="select-none text-brand">{l.cmd.startsWith("#") ? " " : "$"}</span>
+              <code class="min-w-0 flex-1 whitespace-pre-wrap break-all text-fg">
+                {l.cmd}
+              </code>
+              {l.note !== undefined && l.note !== "" && (
+                <span class="hidden shrink-0 text-xs text-muted sm:block">
+                  {l.note}
+                  {l.soon && (
+                    <span class="ml-2 rounded-full border border-line px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                      soon
+                    </span>
+                  )}
+                </span>
+              )}
+              {!l.cmd.startsWith("#") && (
+                <button
+                  data-copy={l.cmd}
+                  class="shrink-0 rounded-md border border-line px-2 py-0.5 font-sans text-xs text-muted opacity-70 transition hover:text-fg hover:opacity-100"
+                  aria-label="Copy command"
+                >
+                  <span data-copy-label>Copy</span>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ))
+    }
+    <div class="mt-5 flex items-center gap-3 border-t border-line pt-4">
+      <span class="select-none text-brand">$</span>
+      <code class="text-fg">gurl --version</code>
+      <span class="cursor"></span>
+    </div>
+  </div>
+</div>

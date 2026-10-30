@@ -1,0 +1,64 @@
+---
+title: Getting started
+description: What gurl is and how to make your first request.
+section: Meet gurl
+order: 1
+---
+
+import Os from "@/components/Os.astro";
+
+**gurl is curl, but written in Go.** It speaks curl's flags, so what you know from curl carries over, and it prints readable output when a person is looking at it.
+
+## Install
+
+<Os for="macos ubuntu arch linux">
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
+```
+</Os>
+<Os for="windows">
+```sh
+go install github.com/CSingogo/gurl/cmd/gurl@latest
+```
+</Os>
+
+Other ways are on the [install page](/docs/install). Pick your system in the top bar and the commands on every page change to match.
+
+## Your first request
+
+```sh
+gurl gurl.somosingogo.dev/get
+```
+
+A bare host gets `http://` added, like curl. In a terminal the JSON is indented and coloured. Pipe it and you get the exact bytes:
+
+```sh
+gurl gurl.somosingogo.dev/get | jq .headers
+```
+
+## Send data
+
+```sh
+# JSON, with the right Content-Type and Accept headers set for you
+gurl --json '{"name":"gopher"}' gurl.somosingogo.dev/post
+
+# Form data, read from a file
+gurl -d @form.txt gurl.somosingogo.dev/post
+
+# Basic auth, then check the status code in a script
+gurl -s -o /dev/null -w '%{http_code}\n' -u user:pass gurl.somosingogo.dev/basic-auth/user/pass
+```
+
+## Exit codes
+
+gurl returns the same exit codes as curl, so `if gurl -f ...; then` works the way it does with curl. For example `7` means the connection failed, `22` means an HTTP error with `-f`, and `28` means a timeout. The [flag reference](/docs/flags) has the full list.
+
+## Roadmap
+
+| Release | Adds |
+| --- | --- |
+| v0.1 | Core HTTP, redirects, timeouts, `-w`, the test server |
+| v0.2 | Uploads and forms: `-F`, `-T`, `--data-urlencode` |
+| v0.3 | Cookies, proxies, compression, HTTP version flags |
+| v0.4 | WebSocket (`ws://`, `wss://`) |
+| v0.5 | Downloads: progress, resume, retries, rate limits |

@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --color-bg: #0e0e10;
+  --color-surface: #161619;
+  --color-surface-2: #1d1d21;
+  --color-line: #26262b;
+  --color-fg: #f4f4f5;
+  --color-muted: #9a9aa3;
+  --color-brand: #05acd7;
+  --color-brand-fg: #04202a;
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: color-mix(in oklab, var(--color-brand) 40%, transparent);
+}
+
+/* Appwrite-style gradient headline and blinking cursor. */
+.gradient-text {
+  background: linear-gradient(90deg, #05acd7 0%, #7be3ff 45%, #f4f4f5 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.cursor::after {
+  content: "_";
+  color: var(--color-brand);
+  animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor::after {
+    animation: none;
+  }
+}
+
+.hero-glow {
+  background:
+    radial-gradient(60% 50% at 50% 0%, color-mix(in oklab, var(--color-brand) 22%, transparent), transparent 70%),
+    radial-gradient(circle at 1px 1px, #ffffff0d 1px, transparent 0) 0 0 / 22px 22px;
+}
+
+/* Prose styles for MDX docs. */
+.prose-docs {
+  max-width: 46rem;
+  line-height: 1.7;
+  color: #d4d4d8;
+}
+.prose-docs h1 {
+  font-size: 2.1rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--color-fg);
+  margin-bottom: 0.75rem;
+}
+.prose-docs h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-fg);
+  margin: 2.4rem 0 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-line);
+}
+.prose-docs h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-fg);
+  margin: 1.8rem 0 0.5rem;
+}
+.prose-docs p,
+.prose-docs ul,
+.prose-docs ol,
+.prose-docs table {
+  margin: 0.9rem 0;
+}
+.prose-docs ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+}
+.prose-docs ol {
+  list-style: decimal;
+  padding-left: 1.4rem;
+}
+.prose-docs a {
+  color: var(--color-brand);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--color-brand) 40%, transparent);
+}
+.prose-docs code:not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+  color: var(--color-fg);
+}
+.prose-docs pre {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  line-height: 1.65;
+  margin: 1.1rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
+  overflow-x: auto;
+  background: var(--color-surface) !important;
+}
+.prose-docs table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.prose-docs th,
+.prose-docs td {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: top;
+}
+.prose-docs th {
+  color: var(--color-fg);
+  font-weight: 600;
+}
+.prose-docs blockquote {
+  border-left: 3px solid var(--color-brand);
+  background: var(--color-surface);
+  padding: 0.6rem 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1rem 0;
+}

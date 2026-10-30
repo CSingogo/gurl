@@ -1,0 +1,132 @@
+---
+// A fake request/response window, in the spirit of a product screenshot. Everything is
+// static HTML; the little script below only switches which request is shown.
+const items = [
+  {
+    id: "get",
+    label: "GET /get",
+    cmd: "gurl gurl.somosingogo.dev/get",
+    status: "200",
+    time: "38 ms",
+    size: "312 B",
+    proto: "HTTP/2",
+    body: [
+      ["{", ""],
+      ['  "args"', "{}"],
+      ['  "headers"', '{ "Accept": "*/*", "User-Agent": "gurl/0.1.0" }'],
+      ['  "method"', '"GET"'],
+      ['  "url"', '"https://gurl.somosingogo.dev/get"'],
+      ["}", ""],
+    ],
+  },
+  {
+    id: "post",
+    label: "POST /post",
+    cmd: `gurl --json '{"name":"gopher"}' gurl.somosingogo.dev/post`,
+    status: "200",
+    time: "41 ms",
+    size: "398 B",
+    proto: "HTTP/2",
+    body: [
+      ["{", ""],
+      ['  "json"', '{ "name": "gopher" }'],
+      ['  "method"', '"POST"'],
+      ['  "headers"', '{ "Content-Type": "application/json" }'],
+      ["}", ""],
+    ],
+  },
+  {
+    id: "teapot",
+    label: "GET /status/418",
+    cmd: "gurl -i gurl.somosingogo.dev/status/418",
+    status: "418",
+    time: "29 ms",
+    size: "62 B",
+    proto: "HTTP/2",
+    body: [["I'm a teapot", ""]],
+  },
+  {
+    id: "redirect",
+    label: "GET /redirect/3",
+    cmd: "gurl -L -w '%{num_redirects} redirects' gurl.somosingogo.dev/redirect/3",
+    status: "200",
+    time: "112 ms",
+    size: "301 B",
+    proto: "HTTP/2",
+    body: [["3 redirects", ""]],
+  },
+];
+---
+
+<div class="mx-auto w-full max-w-6xl overflow-hidden rounded-3xl border border-line bg-surface shadow-2xl shadow-black/40">
+  <div class="flex items-center gap-3 border-b border-line px-5 py-3 text-sm text-muted">
+    <div class="flex gap-1.5" aria-hidden="true">
+      <span class="size-3 rounded-full bg-line"></span><span class="size-3 rounded-full bg-line"></span><span class="size-3 rounded-full bg-line"></span>
+    </div>
+    <span class="text-fg">gurl</span><span>›</span><span>gurl.somosingogo.dev</span><span>›</span><span>request</span>
+  </div>
+  <div class="grid md:grid-cols-[15rem_1fr]">
+    <aside class="border-b border-line p-3 md:border-b-0 md:border-r">
+      <p class="px-2 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted">Try it</p>
+      <ul class="flex gap-1 overflow-x-auto md:flex-col" role="tablist">
+        {
+          items.map((it, i) => (
+            <li>
+              <button
+                role="tab"
+                data-demo-tab={it.id}
+                aria-selected={i === 0}
+                class="w-full whitespace-nowrap rounded-lg px-3 py-2 text-left font-mono text-sm text-muted transition-colors hover:text-fg aria-selected:bg-surface-2 aria-selected:text-fg"
+              >
+                {it.label}
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </aside>
+    <div class="min-w-0">
+      {
+        items.map((it, i) => (
+          <section data-demo-pane={it.id} hidden={i !== 0}>
+            <div class="border-b border-line px-5 py-4 font-mono text-sm">
+              <span class="text-brand">$</span> <span class="break-all">{it.cmd}</span>
+            </div>
+            <dl class="grid grid-cols-2 border-b border-line sm:grid-cols-4">
+              {[
+                ["Status", it.status],
+                ["Time", it.time],
+                ["Size", it.size],
+                ["Protocol", it.proto],
+              ].map(([k, v], j) => (
+                <div class:list={["px-5 py-4", j > 0 && "sm:border-l sm:border-line"]}>
+                  <dd class="text-2xl font-semibold tracking-tight">{v}</dd>
+                  <dt class="text-xs text-muted">{k}</dt>
+                </div>
+              ))}
+            </dl>
+            <div class="overflow-x-auto whitespace-pre px-5 py-5 font-mono text-[13px] leading-6">
+              {it.body.map(([k, v]) => (
+                <div>
+                  <span class="text-[#7be3ff]">{k}</span>
+                  {v && <span class="text-muted">: </span>}
+                  <span class="text-[#f6c177]">{v}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("click", (e) => {
+    const tab = (e.target as HTMLElement).closest<HTMLElement>("[data-demo-tab]");
+    if (!tab) return;
+    const id = tab.dataset.demoTab;
+    document.querySelectorAll<HTMLElement>("[data-demo-tab]").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+    document.querySelectorAll<HTMLElement>("[data-demo-pane]").forEach((p) => (p.hidden = p.dataset.demoPane !== id));
+  });
+</script>

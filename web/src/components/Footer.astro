@@ -1,0 +1,17 @@
+---
+import { site } from "@/lib/site";
+---
+
+<footer class="border-t border-line">
+  <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <p>
+      MIT licensed. Built by <a class="text-fg underline-offset-4 hover:underline" href={site.author}>Chisomo Singogo</a> while learning Go and Linux.
+    </p>
+    <div class="flex gap-5">
+      <a class="hover:text-fg" href={site.repo}>GitHub</a>
+      <a class="hover:text-fg" href={site.releases}>Releases</a>
+      <a class="hover:text-fg" href="/docs/getting-started">Docs</a>
+      <a class="hover:text-fg" href={site.sponsor}>Sponsor</a>
+    </div>
+  </div>
+</footer>

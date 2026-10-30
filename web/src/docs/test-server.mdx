@@ -1,0 +1,27 @@
+---
+title: Test server
+description: The httpbin-style endpoints that run on this domain.
+section: Using gurl
+order: 4
+---
+
+This domain runs a small echo server, written in Go too, so you can try gurl without setting anything up. It is rate limited per IP and caps request bodies at 1 MB.
+
+| Endpoint | What it does |
+| --- | --- |
+| `/get`, `/post`, `/put`, `/patch`, `/delete` | Echo the request: method, headers, query, body |
+| `/anything` and `/anything/{path}` | Same, for any method and path |
+| `/headers`, `/ip`, `/user-agent` | Return just that part of your request |
+| `/status/{code}` | Respond with that status code (try `418`) |
+| `/delay/{n}` | Wait `n` seconds (up to 10) before answering |
+| `/bytes/{n}` | `n` random bytes (up to 1 MB). `?seed=` makes them repeatable |
+| `/redirect/{n}` | Redirect `n` times, then land on `/get` |
+| `/basic-auth/{user}/{pass}` | `200` only with those credentials |
+| `/json` | A small JSON document |
+| `/gzip` | A gzip-compressed response |
+
+```sh
+gurl -L gurl.somosingogo.dev/redirect/3
+gurl -m 2 gurl.somosingogo.dev/delay/5    # times out, exit code 28
+gurl -f gurl.somosingogo.dev/status/404   # exit code 22
+```

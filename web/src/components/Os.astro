@@ -1,0 +1,10 @@
+---
+// Wrap MDX content that only applies to some systems: <Os for="macos linux">...</Os>.
+// Without JavaScript every block stays visible; with it, only the picked system shows.
+interface Props {
+  for: string;
+}
+const { for: only } = Astro.props;
+---
+
+<div data-os-only={only}><slot /></div>

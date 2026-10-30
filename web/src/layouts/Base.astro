@@ -1,0 +1,116 @@
+---
+import { Font } from "astro:assets";
+import { site } from "@/lib/site";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import "@/styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Hide the footer on app-like pages. */
+  bare?: boolean;
+}
+const { title, description = site.description, bare = false } = Astro.props;
+const fullTitle = title ? `${title} · gurl` : `gurl: ${site.tagline}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+---
+
+<!doctype html>
+<html lang="en" data-os="macos">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0e0e10" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="gurl" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <Font cssVariable="--font-geist-sans" />
+    <Font cssVariable="--font-geist-mono" />
+    <!-- Pick the OS before first paint: saved choice, else guess from the browser. -->
+    <script is:inline>
+      (function () {
+        var os = "macos";
+        try {
+          var saved = localStorage.getItem("gurl-os");
+          if (saved) os = saved;
+          else {
+            var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent || "";
+            if (/win/i.test(p)) os = "windows";
+            else if (/linux|x11/i.test(p) && !/android/i.test(navigator.userAgent)) os = "linux";
+          }
+        } catch (e) {}
+        document.documentElement.dataset.os = os;
+      })();
+    </script>
+  </head>
+  <body class="flex flex-col">
+    <Header />
+    <main class="flex-1"><slot /></main>
+    {!bare && <Footer />}
+    <!-- Shared OS state: every picker and every [data-os-only] block follows html[data-os]. -->
+    <script>
+      const groups: Record<string, string[]> = {
+        macos: ["macos"],
+        ubuntu: ["ubuntu", "linux"],
+        arch: ["arch", "linux"],
+        linux: ["linux"],
+        windows: ["windows"],
+      };
+      function apply() {
+        const os = document.documentElement.dataset.os ?? "macos";
+        const show = groups[os] ?? [os];
+        document.querySelectorAll<HTMLElement>("[data-os-only]").forEach((el) => {
+          const wants = (el.dataset.osOnly ?? "").split(" ");
+          el.hidden = !wants.some((w) => show.includes(w));
+        });
+        document.querySelectorAll<HTMLSelectElement>("select[data-os-picker]").forEach((s) => (s.value = os));
+        document.querySelectorAll<HTMLElement>("[data-os-tab]").forEach((t) => {
+          t.setAttribute("aria-selected", String(t.dataset.osTab === os));
+        });
+      }
+      document.addEventListener("click", (e) => {
+        const tab = (e.target as HTMLElement).closest<HTMLElement>("[data-os-tab]");
+        if (tab?.dataset.osTab) setOs(tab.dataset.osTab);
+      });
+      document.addEventListener("change", (e) => {
+        const t = e.target as HTMLElement;
+        if (t instanceof HTMLSelectElement && t.hasAttribute("data-os-picker")) setOs(t.value);
+      });
+      function setOs(os: string) {
+        document.documentElement.dataset.os = os;
+        try {
+          localStorage.setItem("gurl-os", os);
+        } catch {}
+        apply();
+      }
+      apply();
+
+      // Copy buttons: <button data-copy="text">.
+      document.addEventListener("click", async (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
+        if (!btn) return;
+        const text = btn.dataset.copy ?? "";
+        try {
+          await navigator.clipboard.writeText(text);
+          const label = btn.querySelector("[data-copy-label]");
+          if (label) {
+            const old = label.textContent;
+            label.textContent = "Copied";
+            setTimeout(() => (label.textContent = old), 1400);
+          }
+        } catch {}
+      });
+    </script>
+  </body>
+</html>

@@ -40,6 +40,14 @@ jobs:
             -ldflags "-s -w -X main.version=$VERSION" \
             -o gurl-server ./cmd/gurl-server
 
+      # The Astro site is plain static files, served by Caddy straight from disk.
+      - uses: oven-sh/setup-bun@v2
+      - name: Build site
+        working-directory: web
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -59,6 +67,12 @@ jobs:
         run: |
           rsync -z --chmod=755 gurl-server "$SSH_USER@$SSH_HOST:/opt/gurl/gurl-server.new"
           ssh "$SSH_USER@$SSH_HOST" 'mv /opt/gurl/gurl-server.new /opt/gurl/gurl-server && sudo systemctl restart gurl'
+
+      - name: Upload site
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: rsync -az --delete web/dist/ "$SSH_USER@$SSH_HOST:/var/www/gurl/site/"
 
       # Fail the workflow (and show up red on GitHub) if the new version is not serving.
       - name: Health check

@@ -1,0 +1,85 @@
+---
+title: Install
+description: Install gurl on macOS, Linux or Windows.
+section: Meet gurl
+order: 2
+---
+
+import Os from "@/components/Os.astro";
+
+Choose your system in the top bar. The release binaries are static, so there is nothing else to install.
+
+<Os for="macos">
+## macOS
+
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
+```
+
+Homebrew is planned (`brew install CSingogo/tap/gurl`) but isn't published yet.
+</Os>
+
+<Os for="ubuntu">
+## Ubuntu and Debian
+
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
+```
+
+A signed apt repository at `gurl.somosingogo.dev/apt` is planned. Until then you can also download the `.deb` from the [releases page](https://github.com/CSingogo/gurl/releases) and run `sudo dpkg -i gurl_*.deb`.
+</Os>
+
+<Os for="arch">
+## Arch Linux
+
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
+```
+
+An AUR package named `gurl-bin` is planned. The AUR already has an unrelated package called `gurl`, so ours will use the `-bin` name and conflict with it.
+</Os>
+
+<Os for="linux">
+## Linux
+
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
+```
+
+The script detects your CPU, downloads the matching archive from GitHub Releases, **verifies its sha256 checksum**, and installs to `/usr/local/bin` (using `sudo` if needed) or `~/.local/bin` if it can't.
+</Os>
+
+<Os for="windows">
+## Windows
+
+Download `gurl_windows_amd64.zip` (or `arm64`) from the [releases page](https://github.com/CSingogo/gurl/releases), unzip it, and put `gurl.exe` somewhere on your `PATH`. If you have Go installed:
+
+```sh
+go install github.com/CSingogo/gurl/cmd/gurl@latest
+```
+</Os>
+
+## With Go
+
+On any system with Go 1.26 or newer:
+
+```sh
+go install github.com/CSingogo/gurl/cmd/gurl@latest
+```
+
+## Check it worked
+
+```sh
+gurl --version
+```
+
+## Options for the install script
+
+| Variable | Meaning |
+| --- | --- |
+| `GURL_VERSION` | Install a specific release, for example `v0.1.0`, instead of the latest |
+| `GURL_INSTALL_DIR` | Install somewhere other than the default |
+
+```sh
+curl -fsSL https://gurl.somosingogo.dev/install.sh | GURL_VERSION=v0.1.0 sh
+```

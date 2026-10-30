@@ -1,0 +1,71 @@
+---
+title: Flag reference
+description: Every option gurl supports today.
+section: Using gurl
+order: 3
+---
+
+Flags work like curl's. Short flags combine (`-sSL`), values can be attached (`-XPOST`) or separate (`-X POST`), long flags accept `--name=value`, and flags may come after the URL. `--` ends flag parsing.
+
+## Request
+
+| Flag | Meaning |
+| --- | --- |
+| `-X, --request <method>` | HTTP method |
+| `-H, --header <line>` | Extra header. `"Name: value"` sets it, `"Name:"` removes it, `"Name;"` sends it empty |
+| `-d, --data <data>` | Request body. `@file` reads a file, `@-` reads stdin |
+| `--data-raw <data>` | Body, sent as is (`@` is not special) |
+| `--data-binary <data>` | Body from `@file` with no newline stripping |
+| `--json <data>` | Body plus a JSON `Content-Type` and `Accept` |
+| `-G, --get` | Put `-d` data in the query string |
+| `-A, --user-agent <name>` | `User-Agent` header |
+| `-e, --referer <url>` | `Referer` header |
+| `-u, --user <user:pass>` | Basic authentication |
+
+## Output
+
+| Flag | Meaning |
+| --- | --- |
+| `-i, --include` | Show response headers |
+| `-I, --head` | `HEAD` request, headers only |
+| `-v, --verbose` | Show the request and response exchange on stderr |
+| `-s, --silent` | No error messages (`-S` shows them again) |
+| `-f, --fail` | Exit 22 on HTTP errors instead of printing the body |
+| `-o, --output <file>` | Write the body to a file |
+| `-O, --remote-name` | Write to a file named after the URL |
+| `-w, --write-out <format>` | Print variables after the transfer, such as `'%{http_code}\n'` |
+| `--raw` | Never colourise or pretty-print |
+
+## Connection
+
+| Flag | Meaning |
+| --- | --- |
+| `-L, --location` | Follow redirects |
+| `--max-redirs <n>` | Redirect limit (default 50, `-1` for unlimited) |
+| `-k, --insecure` | Skip TLS certificate verification |
+| `-m, --max-time <seconds>` | Timeout for the whole operation |
+| `--connect-timeout <s>` | Connection timeout |
+
+## Write-out variables
+
+`-w` understands `%{http_code}`, `%{time_total}`, `%{size_download}`, `%{num_redirects}`, `%{url_effective}` and more, as in curl.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Success |
+| 1 | Unsupported protocol |
+| 2 | Bad usage (unknown flag, missing value) |
+| 3 | Malformed URL |
+| 6 | Couldn't resolve host |
+| 7 | Couldn't connect |
+| 22 | HTTP error with `-f` |
+| 23 | Write error |
+| 28 | Timeout |
+| 47 | Too many redirects |
+| 60 | TLS certificate problem |
+
+## When output differs from curl
+
+Output is pretty only when stdout is a terminal. Set `NO_COLOR` or pass `--raw` to turn it off. Bodies are byte-identical to curl's. With `-i`, header names are sorted, because Go's HTTP client doesn't keep the order servers send them in.
