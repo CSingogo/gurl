@@ -147,3 +147,43 @@ body {
   border-radius: 0 0.5rem 0.5rem 0;
   margin: 1rem 0;
 }
+
+/* Square copy button used by the install terminal and docs code blocks. */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.copy-btn:hover,
+.copy-btn:focus-visible {
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+.copy-btn .icon-done,
+.copy-btn[data-copied] .icon-copy {
+  display: none;
+}
+.copy-btn[data-copied] .icon-done {
+  display: block;
+  color: var(--color-brand);
+}
+.code-block {
+  position: relative;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+}
+.code-block pre {
+  padding-right: 3.4rem;
+}

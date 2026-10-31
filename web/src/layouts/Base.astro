@@ -97,20 +97,31 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
       }
       apply();
 
-      // Copy buttons: <button data-copy="text">.
+      // Copy buttons: <button data-copy="text">. The icon swaps to a tick for a moment.
       document.addEventListener("click", async (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
         if (!btn) return;
-        const text = btn.dataset.copy ?? "";
         try {
-          await navigator.clipboard.writeText(text);
-          const label = btn.querySelector("[data-copy-label]");
-          if (label) {
-            const old = label.textContent;
-            label.textContent = "Copied";
-            setTimeout(() => (label.textContent = old), 1400);
-          }
+          await navigator.clipboard.writeText(btn.dataset.copy ?? "");
+          btn.setAttribute("data-copied", "");
+          setTimeout(() => btn.removeAttribute("data-copied"), 1400);
         } catch {}
+      });
+
+      // Every code block in the docs gets a copy button in its top-right corner.
+      const iconHtml = `<svg viewBox="0 0 24 24" class="icon-copy size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg viewBox="0 0 24 24" class="icon-done size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>`;
+      document.querySelectorAll<HTMLPreElement>(".prose-docs pre").forEach((pre) => {
+        const wrap = document.createElement("div");
+        wrap.className = "code-block";
+        pre.replaceWith(wrap);
+        wrap.append(pre);
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.setAttribute("aria-label", "Copy code");
+        btn.title = "Copy";
+        btn.dataset.copy = (pre.textContent ?? "").replace(/\n$/, "");
+        btn.innerHTML = iconHtml;
+        wrap.append(btn);
       });
     </script>
     <noscript><style>[data-fade-content]{visibility:visible!important}</style></noscript>

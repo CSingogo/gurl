@@ -78,12 +78,9 @@ const commands: Record<OsId, Line[]> = {
                 </span>
               )}
               {!l.cmd.startsWith("#") && (
-                <button
-                  data-copy={l.cmd}
-                  class="shrink-0 rounded-md border border-line px-2 py-0.5 font-sans text-xs text-muted opacity-70 transition hover:text-fg hover:opacity-100"
-                  aria-label="Copy command"
-                >
-                  <span data-copy-label>Copy</span>
+                <button data-copy={l.cmd} class="copy-btn" aria-label="Copy command" title="Copy">
+                  <svg viewBox="0 0 24 24" class="icon-copy size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V6a2 2 0 0 1 2-2h9" /></svg>
+                  <svg viewBox="0 0 24 24" class="icon-done size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>
                 </button>
               )}
             </div>
