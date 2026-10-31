@@ -17,9 +17,26 @@ import (
 // 80ms until stop() closes the `done` channel; closing a channel wakes every reader
 // at once, which makes it the idiomatic "please stop" signal.
 
-// Blues from deep to bright and back, as xterm-256 colour numbers. Moving this
-// palette along the text one step per frame is what makes the word shimmer.
-var glow = []int{24, 31, 38, 39, 45, 81, 117, 81, 45, 39, 38, 31}
+// Each glow is a palette from deep to bright and back, as xterm-256 colour numbers.
+// Moving a palette along the text one step per frame is what makes the word shimmer.
+// Blue is the default; the verbs that change or destroy data get warmer colours.
+var (
+	glowBlue   = []int{24, 31, 38, 39, 45, 81, 117, 81, 45, 39, 38, 31}
+	glowOrange = []int{94, 130, 166, 172, 208, 214, 215, 214, 208, 172, 166, 130}
+	glowRed    = []int{52, 88, 124, 160, 196, 203, 210, 203, 196, 160, 124, 88}
+)
+
+// glowFor picks the palette for a verb: red for Deleting, orange for Posting and
+// Putting, blue for everything else.
+func glowFor(verb string) []int {
+	switch verb {
+	case "Deleting":
+		return glowRed
+	case "Posting", "Putting":
+		return glowOrange
+	}
+	return glowBlue
+}
 
 var braille = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 
@@ -46,8 +63,9 @@ func VerbFor(method string) string {
 }
 
 // Frame renders frame i of the spinner: a braille dot, the verb with a travelling
-// blue glow, the target, and how long it has been going once that passes a second.
+// glow, the target, and how long it has been going once that passes a second.
 func Frame(i int, verb, target string, elapsed time.Duration) string {
+	glow := glowFor(verb)
 	var b strings.Builder
 	fmt.Fprintf(&b, "\x1b[38;5;%dm%s\x1b[0m ", glow[(i/2)%len(glow)], braille[i%len(braille)])
 	for k, r := range verb {

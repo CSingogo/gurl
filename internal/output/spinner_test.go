@@ -68,3 +68,43 @@ func TestSpinnerDelayAndCleanup(t *testing.T) {
 	}
 	stop() // calling stop twice must be safe
 }
+
+func TestGlowColoursByVerb(t *testing.T) {
+	// 196 is bright red, 208 is orange, 45 is cyan-blue; each appears in its own palette only.
+	has := func(frames []string, code string) bool {
+		for _, f := range frames {
+			if strings.Contains(f, "38;5;"+code+"m") {
+				return true
+			}
+		}
+		return false
+	}
+	frames := func(verb string) []string {
+		var out []string
+		for i := 0; i < 24; i++ {
+			out = append(out, Frame(i, verb, "x.dev", 0))
+		}
+		return out
+	}
+	tests := []struct {
+		verb, want string
+		notWant    []string
+	}{
+		{"Deleting", "196", []string{"208", "45"}},
+		{"Posting", "208", []string{"196", "45"}},
+		{"Putting", "208", []string{"196", "45"}},
+		{"Fetching", "45", []string{"196", "208"}},
+		{"Patching", "45", []string{"196", "208"}},
+	}
+	for _, tt := range tests {
+		f := frames(tt.verb)
+		if !has(f, tt.want) {
+			t.Errorf("%s: missing colour %s", tt.verb, tt.want)
+		}
+		for _, n := range tt.notWant {
+			if has(f, n) {
+				t.Errorf("%s: unexpected colour %s", tt.verb, n)
+			}
+		}
+	}
+}
