@@ -4,7 +4,7 @@
 #   curl -fsSL https://gurl.somosingogo.dev/install.sh | sh
 #
 # Environment:
-#   GURL_VERSION      release to install, e.g. 0.1.0 (default: latest)
+#   GURL_VERSION      release to install, e.g. 0.1.3 (default: latest)
 #   GURL_INSTALL_DIR  where to put the binary (default: /usr/local/bin if
 #                     writable or sudo is available, otherwise ~/.local/bin)
 #
@@ -17,13 +17,27 @@ set -eu
 
 REPO="CSingogo/gurl"
 
+# Colour only when a person is watching (stdout is a terminal) and NO_COLOR is unset.
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+  BLUE=$(printf '\033[38;5;38m'); BOLD=$(printf '\033[1m'); DIM=$(printf '\033[2m')
+  RED=$(printf '\033[31m'); OFF=$(printf '\033[0m'); TTY=1
+else
+  BLUE=""; BOLD=""; DIM=""; RED=""; OFF=""; TTY=0
+fi
+
 say() { printf '%s\n' "$*"; }
-die() { printf 'gurl install: %s\n' "$*" >&2; exit 1; }
+ok() { printf '%s✓%s %s\n' "$BLUE" "$OFF" "$*"; }      # a finished step
+step() { printf '%s→%s %s\n' "$DIM" "$OFF" "$*"; }     # a step starting
+die() { printf '%sgurl install:%s %s\n' "$RED" "$OFF" "$*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
-download() { # download <url> <dest>
+download() { # download <url> <dest> [show-progress]
   if have curl; then
-    curl -fsSL "$1" -o "$2"
+    if [ "${3:-}" = progress ] && [ "$TTY" = 1 ]; then
+      curl -fL --progress-bar "$1" -o "$2"
+    else
+      curl -fsSL "$1" -o "$2"
+    fi
   elif have wget; then
     wget -qO "$2" "$1"
   else
@@ -62,19 +76,32 @@ main() {
   fi
   archive="gurl_${os}_${arch}.tar.gz"
 
+  # Human-friendly names for the messages (the release files keep Go's names).
+  case "$os-$arch" in
+    darwin-arm64) pretty="macOS (Apple Silicon)" ;;
+    darwin-amd64) pretty="macOS (Intel)" ;;
+    linux-arm64) pretty="Linux (ARM64)" ;;
+    linux-amd64) pretty="Linux (x86-64)" ;;
+  esac
+
+  say ""
+  say "${BOLD}gurl${OFF}${BLUE}.${OFF}  curl, but written in Go"
+  say ""
+  ok "Detected $pretty"
+
   # mktemp -d makes a private directory; the trap deletes it however we exit.
   tmp=$(mktemp -d)
   trap 'rm -rf "$tmp"' EXIT INT TERM
 
-  say "Downloading $archive ..."
-  download "$base/$archive" "$tmp/$archive"
+  step "Downloading gurl for $pretty"
+  download "$base/$archive" "$tmp/$archive" progress
   download "$base/checksums.txt" "$tmp/checksums.txt"
 
   want=$(grep " $archive\$" "$tmp/checksums.txt" | cut -d ' ' -f 1)
   [ -n "$want" ] || die "no checksum listed for $archive"
   got=$(sha256_of "$tmp/$archive")
   [ "$want" = "$got" ] || die "checksum mismatch for $archive (expected $want, got $got)"
-  say "Checksum OK."
+  ok "Verified the sha256 checksum"
 
   tar -xzf "$tmp/$archive" -C "$tmp" gurl
 
@@ -89,16 +116,25 @@ main() {
   else
     dir="$HOME/.local/bin"
   fi
+  if [ -n "$sudo" ]; then
+    step "Installing to $dir (sudo will ask for your password; set GURL_INSTALL_DIR=\$HOME/.local/bin to avoid that)"
+  else
+    step "Installing to $dir"
+  fi
   mkdir -p "$dir" 2>/dev/null || $sudo mkdir -p "$dir"
   $sudo install -m 755 "$tmp/gurl" "$dir/gurl"
+  ok "Installed $dir/gurl"
 
-  say "Installed gurl to $dir/gurl"
   case ":$PATH:" in
     *":$dir:"*) ;;
-    *) say "Note: $dir is not on your PATH. Add this to your shell profile:"
+    *) say ""
+       say "Note: $dir is not on your PATH. Add this to your shell profile:"
        say "  export PATH=\"$dir:\$PATH\"" ;;
   esac
-  "$dir/gurl" --version
+  say ""
+  say "${BOLD}$("$dir/gurl" --version)${OFF} is ready. Try it:"
+  say "  ${BLUE}\$${OFF} gurl https://gurl.somosingogo.dev/get"
+  say ""
 }
 
 main "$@"
