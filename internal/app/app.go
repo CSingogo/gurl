@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/CSingogo/gurl/internal/cli"
 	"github.com/CSingogo/gurl/internal/output"
@@ -47,13 +48,43 @@ func Run(ctx context.Context, args []string, stdin io.Reader, stdout, stderr io.
 	if o.Verbose {
 		verbose = stderr
 	}
+
+	// While we wait for the response, show a live line on stderr (terminals only; -s and
+	// -v keep the stream clean). It appears after 150ms so quick requests never flash it.
+	stopSpinner := func() {}
+	if output.IsTerminal(stderr) && !o.Silent && !o.Verbose {
+		stopSpinner = output.StartSpinner(stderr, output.VerbFor(requestMethod(o)), targetLabel(u), 150*time.Millisecond)
+	}
 	res, err := request.Do(ctx, o, stdin, verbose)
+	stopSpinner()
 	if err != nil {
 		return fail(stderr, quiet, err, false)
 	}
 	defer res.Resp.Body.Close()
 
 	return show(o, u, res, stdout, stderr, quiet)
+}
+
+// requestMethod mirrors request.Build's choice of method, for the spinner's verb.
+func requestMethod(o *cli.Options) string {
+	switch {
+	case o.Method != "":
+		return o.Method
+	case o.Head:
+		return http.MethodHead
+	case len(o.Data) > 0 && !o.GetMode:
+		return http.MethodPost
+	}
+	return http.MethodGet
+}
+
+// targetLabel is the short "host/path" shown next to the spinner.
+func targetLabel(u *url.URL) string {
+	s := u.Host + u.EscapedPath()
+	if len(s) > 50 {
+		s = s[:49] + "…"
+	}
+	return s
 }
 
 // show writes the response according to the output flags and returns the exit code.

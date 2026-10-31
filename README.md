@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="gurl: curl, but written in Go" width="720">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
+    <img src="assets/banner-dark.svg" alt="gurl: curl, but written in Go" width="720">
+  </picture>
 </p>
 
 <p align="center">
@@ -29,6 +33,12 @@
 - [ ] Cookies, proxies, compression, HTTP version flags (v0.3)
 - [ ] WebSocket, written from scratch against RFC 6455 (v0.4)
 - [ ] Downloads: progress, resume, retries, rate limits (v0.5)
+
+Watch "releases" of this repo to get notified of new versions.
+
+## Documentation
+
+Full docs live at [gurl.somosingogo.dev/docs](https://gurl.somosingogo.dev/docs/getting-started): install for your system, every flag, and the test server's endpoints. The install and flag pages change their commands to match the system you pick.
 
 ## Install
 
@@ -60,6 +70,28 @@ gurl -s -o /dev/null -w '%{http_code}\n' https://gurl.somosingogo.dev/status/418
 
 A bare host gets `http://` added, like curl. If a server answers with an empty redirect, gurl tells you so on a terminal; add `-L` to follow it. Full flag list: `gurl --help` or the [docs](https://gurl.somosingogo.dev/docs/flags).
 
+## How it works
+
+gurl is two programs in one repo, both plain Go with no third-party dependencies.
+
+- **`gurl`** is the client. A hand-written parser turns curl-style arguments into an options value, a request builder turns that into an `http.Request`, and an output layer decides between raw bytes and the pretty terminal view. While it waits for a response it shows a small animated status line on stderr, only on a terminal.
+- **`gurl-server`** is the test server behind [gurl.somosingogo.dev](https://gurl.somosingogo.dev): httpbin-style endpoints (`/get`, `/status/418`, `/delay/2`, `/redirect/3`, …) with per-IP rate limiting and graceful shutdown. It runs under systemd behind Caddy and Cloudflare.
+- **`web/`** is the website, built with Astro and MDX and served as static files.
+
+| Part | Where |
+| --- | --- |
+| Argument parser | `internal/cli` |
+| Request building, redirects, timeouts, exit codes | `internal/request` |
+| Raw and pretty output, `-w`, the spinner | `internal/output` |
+| Test server | `internal/server` |
+| Website and docs | `web/` |
+
+## Community & Support
+
+- [GitHub Issues](https://github.com/CSingogo/gurl/issues). Best for: bugs, and flags where gurl behaves differently from curl.
+- [GitHub Discussions](https://github.com/CSingogo/gurl/discussions). Best for: questions, ideas and show-and-tell.
+- [Sponsor](https://github.com/sponsors/CSingogo). Best for: keeping the test server running.
+
 ## Develop
 
 | Task | Command |
@@ -70,6 +102,16 @@ A bare host gets `http://` added, like curl. If a server answers with an empty r
 | Work on the website | `cd web && bun install && bun run dev` |
 
 The code is small on purpose and commented to explain the Go and Linux ideas behind it. Layout, conventions and deploy notes are in [AGENTS.md](AGENTS.md).
+
+## Badge
+
+Using gurl to test your API? Add the badge:
+
+![Tested with gurl](assets/badge-made-with-gurl.svg)
+
+```md
+[![Tested with gurl](https://raw.githubusercontent.com/CSingogo/gurl/main/assets/badge-made-with-gurl.svg)](https://gurl.somosingogo.dev)
+```
 
 ## License
 
