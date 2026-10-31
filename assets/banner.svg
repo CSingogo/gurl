@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260" role="img" aria-label="gurl: curl, but written in Go">
+  <rect width="900" height="260" rx="20" fill="#0e0e10"/>
+  <text x="120" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="104" font-weight="600" fill="#f4f4f5" letter-spacing="-3">gurl</text>
+  <circle cx="338" cy="140" r="11" fill="#05acd7"/>
+  <text x="420" y="118" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#f4f4f5">Gurl is curl,</text>
+  <text x="420" y="158" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#05acd7">but written in Go.</text>
+</svg>
