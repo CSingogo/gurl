@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/CSingogo/gurl/internal/cli"
 )
 
 // run drives the whole CLI against args and returns stdout, stderr and the exit code.
@@ -192,5 +194,37 @@ func TestRunMetaAndUsage(t *testing.T) {
 	_, errOut, code = run(t, "", "ws://example.com")
 	if code != 1 || !strings.Contains(errOut, "v0.4") {
 		t.Errorf("ws: code=%d err=%q", code, errOut)
+	}
+}
+
+func TestRedirectHint(t *testing.T) {
+	resp := func(code int, loc string) *http.Response {
+		h := http.Header{}
+		if loc != "" {
+			h.Set("Location", loc)
+		}
+		return &http.Response{StatusCode: code, Header: h}
+	}
+	tests := []struct {
+		name string
+		o    cli.Options
+		resp *http.Response
+		n    int64
+		want bool
+	}{
+		{"empty 308", cli.Options{}, resp(308, "https://x.dev/"), 0, true},
+		{"followed with -L", cli.Options{Location: true}, resp(308, "https://x.dev/"), 0, false},
+		{"redirect with a body", cli.Options{}, resp(301, "https://x.dev/"), 120, false},
+		{"HEAD request", cli.Options{Head: true}, resp(301, "https://x.dev/"), 0, false},
+		{"no Location header", cli.Options{}, resp(304, ""), 0, false},
+		{"plain 200", cli.Options{}, resp(200, ""), 0, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := redirectHint(&tt.o, tt.resp, tt.n)
+			if (got != "") != tt.want {
+				t.Fatalf("redirectHint = %q, want hint: %v", got, tt.want)
+			}
+		})
 	}
 }

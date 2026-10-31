@@ -99,7 +99,26 @@ func show(o *cli.Options, u *url.URL, res *request.Result, stdout, stderr io.Wri
 	}
 	res.Done()
 	writeOut(o, res, n, stdout)
+
+	// A bare "gurl example.com" that answers with a redirect prints nothing, exactly
+	// like curl. When a person is watching, say why instead of leaving them guessing.
+	if !quiet && dest == stdout && output.IsTTY(stdout) {
+		if hint := redirectHint(o, resp, n); hint != "" {
+			st := output.Style{Color: output.IsTerminal(stderr)}
+			fmt.Fprintln(stderr, st.Dim(hint))
+		}
+	}
 	return 0
+}
+
+// redirectHint explains an empty redirect response, or returns "" when there is
+// nothing to explain (redirects were followed, there was a body, or it is not a redirect).
+func redirectHint(o *cli.Options, resp *http.Response, bodyBytes int64) string {
+	loc := resp.Header.Get("Location")
+	if o.Location || o.Head || bodyBytes > 0 || loc == "" || resp.StatusCode < 300 || resp.StatusCode > 399 {
+		return ""
+	}
+	return fmt.Sprintf("gurl: HTTP %d redirect to %s (nothing to print; add -L to follow it)", resp.StatusCode, loc)
 }
 
 // copyBody streams the body to w. On a terminal, JSON bodies are buffered (up
@@ -188,7 +207,8 @@ func fail(stderr io.Writer, quiet bool, err error, usage bool) int {
 		ee = &cli.ExitError{Code: 1, Msg: err.Error()}
 	}
 	if !quiet {
-		fmt.Fprintf(stderr, "gurl: (%d) %s\n", ee.Code, ee.Msg)
+		st := output.Style{Color: output.IsTerminal(stderr)}
+		fmt.Fprintf(stderr, "%s %s %s\n", st.Red("gurl:"), st.Yellow(fmt.Sprintf("(%d)", ee.Code)), ee.Msg)
 		if usage {
 			fmt.Fprintln(stderr, "Try 'gurl --help' for more information.")
 		}

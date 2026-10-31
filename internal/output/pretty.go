@@ -12,15 +12,18 @@ import (
 // IsTerminal reports whether w is a character device (a terminal) and the user
 // has not opted out of color with NO_COLOR (https://no-color.org).
 func IsTerminal(w io.Writer) bool {
+	return IsTTY(w) && os.Getenv("NO_COLOR") == ""
+}
+
+// IsTTY reports whether w is a terminal, ignoring NO_COLOR. Use it for things
+// that are about a human being present (hints), not about colour.
+func IsTTY(w io.Writer) bool {
 	f, ok := w.(*os.File)
 	if !ok {
 		return false
 	}
 	st, err := f.Stat()
-	if err != nil || st.Mode()&os.ModeCharDevice == 0 {
-		return false
-	}
-	return os.Getenv("NO_COLOR") == ""
+	return err == nil && st.Mode()&os.ModeCharDevice != 0
 }
 
 // IsJSON reports whether a Content-Type header describes JSON, including

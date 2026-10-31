@@ -32,6 +32,11 @@ func (s Style) paint(code, text string) string {
 	return code + text + reset
 }
 
+// Red, Yellow and Dim are for messages gurl prints about itself (errors, hints).
+func (s Style) Red(text string) string    { return s.paint(bold+red, text) }
+func (s Style) Yellow(text string) string { return s.paint(yellow, text) }
+func (s Style) Dim(text string) string    { return s.paint(dim, text) }
+
 // StatusLine renders "HTTP/1.1 200 OK". curl prints HTTP/2 responses as
 // "HTTP/2 200" with no reason phrase, so gurl does too.
 func StatusLine(resp *http.Response) string {
