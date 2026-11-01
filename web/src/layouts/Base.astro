@@ -38,6 +38,18 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <Font cssVariable="--font-geist-sans" />
     <Font cssVariable="--font-geist-mono" />
     <Font cssVariable="--font-wordmark" />
+    <!-- Self-hosted Umami (stats.somosingogo.dev). Production only; data-domains ignores localhost. -->
+    {
+      import.meta.env.PROD && (
+        <script
+          is:inline
+          defer
+          src="https://stats.somosingogo.dev/script.js"
+          data-website-id="6036a524-1d49-4334-9a2f-6952dffec783"
+          data-domains="gurl.somosingogo.dev"
+        />
+      )
+    }
     <!-- Pick the OS before first paint: saved choice, else guess from the browser. -->
     <script is:inline>
       (function () {
